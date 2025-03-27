@@ -1,2 +1,2 @@
-# Echoing Maze
+# Echo Chess
 
