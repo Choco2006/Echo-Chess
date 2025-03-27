@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -I include -L lib -Dmain=SDL_main
 
-SRC = $(wildcard src/core/*.cpp src/menu/*.cpp) EchoChess.cpp
+SRC = $(wildcard src/core/*.cpp src/menu/*.cpp src/option/*.cpp src/play/*.cpp) EchoChess.cpp
 
 EXE = EchoChess.exe
 

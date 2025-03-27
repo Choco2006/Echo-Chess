@@ -1,6 +1,8 @@
 #include "game.h"
 #include "window.h"
 #include "../src/menu/menu.h"
+#include "../src/option/option.h"
+#include "../play/play.h"
 
 void runGame(){
 
@@ -11,6 +13,12 @@ void runGame(){
     //load menu
     if (!LoadMenu(renderer)){
         std::cerr << "Khong load duoc menu!" << std::endl;
+        isRunning = false;
+    }
+
+    // Load Option UI
+    if (!LoadOption(renderer)) {
+        std::cerr << "Không load duoc option!" << std::endl;
         isRunning = false;
     }
 
@@ -30,7 +38,11 @@ void runGame(){
         if (isMenu){
             RenderMenu(renderer);
         } else {
-
+            if (!isPlaying){
+                isPlaying = true;
+                InitPlay(renderer);
+            }
+            RenderPlay(renderer);
         }
 
         SDL_RenderPresent(renderer);
@@ -38,4 +50,6 @@ void runGame(){
     }
 
     CleanupMenu();
+    CleanupOption();
+    CleanupPlay();
 }

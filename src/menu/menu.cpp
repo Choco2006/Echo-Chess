@@ -1,6 +1,6 @@
 #include "menu.h"
-
 #include "../src/core/init.h"
+#include "../src/option/option.h"
 
 SDL_Texture* backgroundTexture = nullptr;
 Mix_Music* bgMusic = nullptr;
@@ -35,19 +35,19 @@ bool LoadMenu(SDL_Renderer* renderer) {
     //load texture cho nut
     //nut play
     SDL_Surface* playSurface = IMG_Load("resources/images/button/play_button.png");
-    SDL_Surface* playHoverSurface = IMG_Load("resources/images/button/button_hover.png");
+    SDL_Surface* playHoverSurface = IMG_Load("resources/images/button/play_button_hover.png");
 
     //nut load game
     SDL_Surface* loadSurface = IMG_Load("resources/images/button/load_button.png");
-    SDL_Surface* loadHoverSurface = IMG_Load("resources/images/button/button_hover.png");
+    SDL_Surface* loadHoverSurface = IMG_Load("resources/images/button/load_button_hover.png");
 
     //nut option
     SDL_Surface* optionSurface = IMG_Load("resources/images/button/option_button.png");
-    SDL_Surface* optionHoverSurface = IMG_Load("resources/images/button/button_hover.png");
+    SDL_Surface* optionHoverSurface = IMG_Load("resources/images/button/option_button_hover.png");
 
     //nut exit
     SDL_Surface* exitSurface = IMG_Load("resources/images/button/exit_button.png");
-    SDL_Surface* exitHoverSurface = IMG_Load("resources/images/button/button_hover.png");
+    SDL_Surface* exitHoverSurface = IMG_Load("resources/images/button/exit_button_hover.png");
 
     if (!playSurface || !playHoverSurface || !exitSurface || !exitHoverSurface ||
     !loadSurface || !loadHoverSurface || !optionSurface || !optionHoverSurface) {
@@ -93,6 +93,11 @@ bool LoadMenu(SDL_Renderer* renderer) {
     menuButtons.push_back(Button((960 - 200)/2, 410, 200, 50, optionTexture, optionHoverTexture));  //"option"
     menuButtons.push_back(Button((960 - 200)/2, 490, 200, 50, exitTexture, exitHoverTexture));  // "exit"
 
+    // Tải option menu
+    if (!LoadOption(renderer)) {
+        std::cerr << "Không thể tải Option Menu!" << std::endl;
+        return false;
+    }
 
     //phan return ham bool gốc
     return true; 
@@ -104,6 +109,9 @@ void RenderMenu(SDL_Renderer* renderer) {
     for (auto& button : menuButtons) {
         button.Render(renderer);
     }
+    if (isOptionOpen) {
+        RenderOption(renderer);
+    }
 }
 
 //cac nut menu
@@ -112,12 +120,22 @@ void HandleMenuEvent(SDL_Event& e, bool& isRunning, bool& inMenu){
         isRunning = false;
     }
 
-    if (menuButtons[0].HandleEvent(e)){ //"play"
+    //nut play
+    if (menuButtons[0].HandleEvent(e)){
         std::cout << "Bat dau tro choi moi!" << std::endl;
         inMenu = false;
     }
 
-    if (menuButtons[3].HandleEvent(e)){ //"exit"
+    //nut"option"
+    if (menuButtons[2].HandleEvent(e)) { 
+        isOptionOpen = true; 
+    }
+    if (isOptionOpen) {
+        HandleOptionEvent(e);
+    }
+
+    //nut "exit"
+    if (menuButtons[3].HandleEvent(e)){
         std::cout << "Thoat game!" << std::endl;
         isRunning = false;
     }
@@ -133,4 +151,5 @@ void CleanupMenu(){
         Mix_FreeMusic(bgMusic);
         bgMusic = nullptr;
     }
+    CleanupOption();
 }
