@@ -29,6 +29,12 @@ bool InitSDL(){
     }
     std::cout << "Khoi tao SDL_image thanh cong!" << std::endl;
 
+    //khoi tao sdl ttf
+    if (TTF_Init() == -1) {
+        std::cerr << "Khoi tao TTF that bai! Loi: " << TTF_GetError() << std::endl;
+        return false;
+    }
+
     return true;
 }
 

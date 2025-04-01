@@ -1,11 +1,20 @@
 CXX = g++
 CXXFLAGS = -I include -L lib -Dmain=SDL_main
 
-SRC = $(wildcard src/core/*.cpp src/menu/*.cpp src/option/*.cpp src/play/*.cpp) EchoChess.cpp
-
+SRC = $(wildcard src/core/*.cpp) \
+      $(wildcard src/menu/*.cpp) \
+      $(wildcard src/option/*.cpp) \
+      $(wildcard src/play/*.cpp) \
+      $(wildcard src/play/pieces/pawn/pawn.cpp) \
+      $(wildcard src/play/pieces/knight/knight.cpp) \
+      $(wildcard src/play/pieces/rook/rook.cpp) \
+      $(wildcard src/play/pieces/bishop/bishop.cpp) \
+      $(wildcard src/play/pieces/king/king.cpp) \
+      $(wildcard src/play/pieces/queen/queen.cpp) \
+      EchoChess.cpp
 EXE = EchoChess.exe
 
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 
 DEBUG_FLAGS = -g -Wall
 RELEASE_FLAGS = -O2
