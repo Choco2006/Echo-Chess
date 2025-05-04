@@ -37,10 +37,6 @@ bool LoadMenu(SDL_Renderer* renderer) {
     SDL_Surface* playSurface = IMG_Load("resources/images/button/play_button.png");
     SDL_Surface* playHoverSurface = IMG_Load("resources/images/button/play_button_hover.png");
 
-    //nut load game
-    SDL_Surface* loadSurface = IMG_Load("resources/images/button/load_button.png");
-    SDL_Surface* loadHoverSurface = IMG_Load("resources/images/button/load_button_hover.png");
-
     //nut option
     SDL_Surface* optionSurface = IMG_Load("resources/images/button/option_button.png");
     SDL_Surface* optionHoverSurface = IMG_Load("resources/images/button/option_button_hover.png");
@@ -50,7 +46,7 @@ bool LoadMenu(SDL_Renderer* renderer) {
     SDL_Surface* exitHoverSurface = IMG_Load("resources/images/button/exit_button_hover.png");
 
     if (!playSurface || !playHoverSurface || !exitSurface || !exitHoverSurface ||
-    !loadSurface || !loadHoverSurface || !optionSurface || !optionHoverSurface) {
+    !optionSurface || !optionHoverSurface) {
         std::cerr << "Khong the tai duoc hinh anh nut! Loi: " << IMG_GetError() << std::endl;
         return false;
     }
@@ -58,10 +54,6 @@ bool LoadMenu(SDL_Renderer* renderer) {
     //texture nut play
     SDL_Texture* playTexture = SDL_CreateTextureFromSurface(renderer, playSurface);
     SDL_Texture* playHoverTexture = SDL_CreateTextureFromSurface(renderer, playHoverSurface);
-
-    //texture nut load game
-    SDL_Texture* loadTexture = SDL_CreateTextureFromSurface(renderer, loadSurface);
-    SDL_Texture* loadHoverTexture = SDL_CreateTextureFromSurface(renderer, loadHoverSurface);
 
     //texture nut option
     SDL_Texture* optionTexture = SDL_CreateTextureFromSurface(renderer, optionSurface);
@@ -75,10 +67,6 @@ bool LoadMenu(SDL_Renderer* renderer) {
     SDL_FreeSurface(playSurface);
     SDL_FreeSurface(playHoverSurface);
 
-    //free surface nut load
-    SDL_FreeSurface(loadSurface);
-    SDL_FreeSurface(loadHoverSurface);
-
     //free surface nut option
     SDL_FreeSurface(optionSurface);
     SDL_FreeSurface(optionHoverSurface);
@@ -88,14 +76,13 @@ bool LoadMenu(SDL_Renderer* renderer) {
     SDL_FreeSurface(exitHoverSurface);
 
     //tao cac nut
-    menuButtons.push_back(Button((960 - 200)/2, 250, 200, 50, playTexture, playHoverTexture));  //"play"
-    menuButtons.push_back(Button((960 - 200)/2, 330, 200, 50, loadTexture, loadHoverTexture));  //"load"
+    menuButtons.push_back(Button((960 - 200)/2, 330, 200, 50, playTexture, playHoverTexture));  //"play"
     menuButtons.push_back(Button((960 - 200)/2, 410, 200, 50, optionTexture, optionHoverTexture));  //"option"
     menuButtons.push_back(Button((960 - 200)/2, 490, 200, 50, exitTexture, exitHoverTexture));  // "exit"
 
     // Tải option menu
     if (!LoadOption(renderer)) {
-        std::cerr << "Không thể tải Option Menu!" << std::endl;
+        std::cerr << "Khong the load option" << std::endl;
         return false;
     }
 
@@ -127,7 +114,7 @@ void HandleMenuEvent(SDL_Event& e, bool& isRunning, bool& inMenu){
     }
 
     //nut"option"
-    if (menuButtons[2].HandleEvent(e)) { 
+    if (menuButtons[1].HandleEvent(e)) { 
         isOptionOpen = true; 
     }
     if (isOptionOpen) {
@@ -135,7 +122,7 @@ void HandleMenuEvent(SDL_Event& e, bool& isRunning, bool& inMenu){
     }
 
     //nut "exit"
-    if (menuButtons[3].HandleEvent(e)){
+    if (menuButtons[2].HandleEvent(e)){
         std::cout << "Thoat game!" << std::endl;
         isRunning = false;
     }

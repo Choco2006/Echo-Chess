@@ -1,6 +1,6 @@
 #include "play.h"
-#include "ui.h"
 #include "board.h"
+#include "../play/castle/castle.h"
 #include <iostream>
 
 bool isPlaying = false;
@@ -20,7 +20,6 @@ void InitPlay(SDL_Renderer* renderer) {
         SDL_FreeSurface(bgSurface);
     }
 
-    InitUI(renderer);
     InitBoard();
     LoadPieceTextures(renderer);
 
@@ -28,19 +27,13 @@ void InitPlay(SDL_Renderer* renderer) {
 }
 
 void HandlePlayEvent(SDL_Event& e) {
-    if (e.type == SDL_KEYDOWN) {
-        if (e.key.keysym.sym == SDLK_ESCAPE) {
-            isPlaying = false;
-        }
-    }
-    
     if (e.type == SDL_MOUSEBUTTONDOWN) {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
 
         int boardSize = 400;
         int cellSize = boardSize / 8;
-        int startX = 50;
+        int startX = (960 - boardSize) / 2;
         int startY = (720 - boardSize) / 2;
 
         int col = (mouseX - startX) / cellSize;
@@ -66,33 +59,33 @@ void HandlePlayEvent(SDL_Event& e) {
                 if (clickedPiece.type != EMPTY && clickedPiece.color == selectedPiece.color) {
                     return;
                 }
-                
-                if (IsValidMove(selectedRow, selectedCol, row, col)){
-                    //pawn
-                    if (selectedPiece.type == PAWN) {
-                        HandlePawnMove(selectedRow, selectedCol, row, col);
+
+                // Kiểm tra nhập thành
+                if (selectedPiece.type == KING && abs(selectedCol - col) == 2) {
+                    Castle castle;
+                    Position kingPos = {selectedRow, selectedCol};
+                    Position rookPos = (col > selectedCol) ? Position{selectedRow, 7} : Position{selectedRow, 0};
+
+                    if (castle.performCastle(board, kingPos, rookPos)) {
+                        selectedPiece = {EMPTY, NONE};
+                        selectedRow = -1;
+                        selectedCol = -1;
+                        currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+                        return; // Kết thúc vì nhập thành đã được thực hiện
                     }
-                
-                    //luu nuoc di truoc
-                    lastMove = {selectedRow, selectedCol, row, col, selectedPiece, board[row][col]};
-                
-                    //cap nhat ban co
-                    board[selectedRow][selectedCol] = {EMPTY, NONE};
-                    board[row][col] = selectedPiece;
-                
-                    //reset lua chon
+                }
+
+                // Di chuyển thông thường
+                if (IsValidMove(selectedRow, selectedCol, row, col) &&
+                    !DoesMovePutKingInCheck(selectedRow, selectedCol, row, col)) {
+                    MovePiece(selectedRow, selectedCol, row, col);
                     selectedPiece = {EMPTY, NONE};
                     selectedRow = -1;
                     selectedCol = -1;
-                
-                    //chuyen luot
-                    currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
                 }
             }
         }
     }
-
-    HandleUIEvent(e);
 }
 
 void RenderPlay(SDL_Renderer* renderer) {
@@ -106,7 +99,7 @@ void RenderPlay(SDL_Renderer* renderer) {
         int boardSize = 400;
         int cellSize = boardSize / 8;
 
-        int startX = 50;
+        int startX = (960 - boardSize) / 2;
         int startY = (720 - boardSize) / 2;
 
         //ve vien mau den
@@ -155,8 +148,6 @@ void RenderPlay(SDL_Renderer* renderer) {
         //ve quan co
         RenderPieces(renderer);
 
-        //ve khung
-        RenderUI(renderer);
     }
 }
 
@@ -165,6 +156,5 @@ void CleanupPlay() {
         SDL_DestroyTexture(playBackgroundTexture);
         playBackgroundTexture = nullptr;
     }
-    CleanupUI();
     std::cout << "Da don dep tai nguyen gameplay" << std::endl;
 }

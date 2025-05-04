@@ -39,6 +39,13 @@ bool IsValidMove(int fromRow, int fromCol, int toRow, int toCol);
 bool IsKingInCheck(PieceColor kingColor);
 std::pair<int, int> GetKingPosition(PieceColor kingColor);
 
+bool DoesMovePutKingInCheck(int fromRow, int fromCol, int toRow, int toCol);
+bool IsClearStraight(int fromRow, int fromCol, int toRow, int toCol);
+bool IsClearDiagonal(int fromRow, int fromCol, int toRow, int toCol);
+
+//nhap thanh
+void MovePiece(int fromRow, int fromCol, int toRow, int toCol);
+
 void InitBoard();
 void LoadPieceTextures(SDL_Renderer* renderer);
 void RenderPieces(SDL_Renderer* renderer);
