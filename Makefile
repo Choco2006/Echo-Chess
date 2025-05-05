@@ -11,7 +11,8 @@ SRC = $(wildcard src/core/*.cpp) \
       $(wildcard src/play/pieces/bishop/bishop.cpp) \
       $(wildcard src/play/pieces/king/king.cpp) \
       $(wildcard src/play/pieces/queen/queen.cpp) \
-      $(wildcard src/play/castle/castle.cpp) \
+      $(wildcard src/play/promotion/promotion.cpp) \
+      $(wildcard src/play/castle/castling.cpp) \
       EchoChess.cpp
 EXE = EchoChess.exe
 

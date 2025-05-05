@@ -21,7 +21,7 @@ void runGame(){
         std::cerr << "Không load duoc option!" << std::endl;
         isRunning = false;
     }
-
+    
     while (isRunning){
         SDL_RenderClear(renderer);
 

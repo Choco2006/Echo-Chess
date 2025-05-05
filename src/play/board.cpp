@@ -1,5 +1,6 @@
 #include "board.h"
-#include "../play/castle/castle.h"
+#include "../src/play/promotion/promotion.h"
+#include "../src/play/castle/castling.h"
 #include <iostream>
 
 Piece board[8][8];
@@ -176,20 +177,16 @@ bool DoesMovePutKingInCheck(int fromRow, int fromCol, int toRow, int toCol) {
 void MovePiece(int fromRow, int fromCol, int toRow, int toCol) {
     Piece piece = board[fromRow][fromCol];
 
-    // Kiểm tra nếu là nước đi nhập thành
+    //kiem tra nuoc di nhap thanh
     if (piece.type == KING && abs(fromCol - toCol) == 2) {
-        Castle castle;
-        Position kingPos = {fromRow, fromCol};
-        Position rookPos = (toCol > fromCol) ? Position{fromRow, 7} : Position{fromRow, 0};
-
-        if (castle.performCastle(board, kingPos, rookPos)) {
+        if (PerformCastle(fromRow, fromCol, (toCol > fromCol) ? 7 : 0, piece.color)) {
             lastMove = {fromRow, fromCol, toRow, toCol, piece, {EMPTY, NONE}};
             currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
-            return; // Kết thúc vì nhập thành đã được thực hiện
+            return;
         }
     }
 
-    // Xử lý di chuyển thông thường
+    //xu ly nuoc di binh thuong
     Piece tempPiece = board[toRow][toCol];
     board[toRow][toCol] = piece;
     board[fromRow][fromCol] = {EMPTY, NONE};
@@ -200,6 +197,10 @@ void MovePiece(int fromRow, int fromCol, int toRow, int toCol) {
     } else {
         lastMove = {fromRow, fromCol, toRow, toCol, piece, tempPiece};
         currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+
+    //phong hau
+    PromotePawn(toRow, toCol);
+
     }
 }
 

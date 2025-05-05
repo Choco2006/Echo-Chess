@@ -1,6 +1,6 @@
 #include "play.h"
 #include "board.h"
-#include "../play/castle/castle.h"
+#include "../src/play/castle/castling.h"
 #include <iostream>
 
 bool isPlaying = false;
@@ -10,8 +10,6 @@ int selectedCol = -1;
 Piece selectedPiece = {EMPTY, NONE};
 
 void InitPlay(SDL_Renderer* renderer) {
-    std::cout << "Dang khoi tao gameplay" << std::endl;
-
     SDL_Surface* bgSurface = IMG_Load("resources/images/main/play_background.png");
     if (!bgSurface) {
         std::cerr << "Khong the tai background! Loi: " << IMG_GetError() << std::endl;
@@ -22,8 +20,6 @@ void InitPlay(SDL_Renderer* renderer) {
 
     InitBoard();
     LoadPieceTextures(renderer);
-
-    std::cout << "Khoi tao gameplay thanh cong!" << std::endl;
 }
 
 void HandlePlayEvent(SDL_Event& e) {
@@ -31,6 +27,19 @@ void HandlePlayEvent(SDL_Event& e) {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
 
+        //nut replay
+        SDL_Rect replayButton = {280 + 400 / 2 - 50, 160 + 400 + 20, 100, 50};
+        if (mouseX >= replayButton.x && mouseX <= replayButton.x + replayButton.w &&
+            mouseY >= replayButton.y && mouseY <= replayButton.y + replayButton.h) {
+            // Reset game
+            InitBoard();
+            selectedPiece = {EMPTY, NONE};
+            selectedRow = -1;
+            selectedCol = -1;
+            currentTurn = WHITE;
+            return;
+        }
+        
         int boardSize = 400;
         int cellSize = boardSize / 8;
         int startX = (960 - boardSize) / 2;
@@ -39,6 +48,7 @@ void HandlePlayEvent(SDL_Event& e) {
         int col = (mouseX - startX) / cellSize;
         int row = (mouseY - startY) / cellSize;
 
+        //kiem tra chon quan co
         if (row >= 0 && row < 8 && col >= 0 && col < 8) {
             Piece clickedPiece = board[row][col];
 
@@ -49,6 +59,18 @@ void HandlePlayEvent(SDL_Event& e) {
                     selectedCol = col;
                 }
             } else {
+                //chon vua + bam vao xe -> nhap thanh
+                if (selectedPiece.type == KING && clickedPiece.type == ROOK && clickedPiece.color == currentTurn) {
+                    if (CanCastle(selectedRow, selectedCol, col, currentTurn)) {
+                        if (PerformCastle(selectedRow, selectedCol, col, currentTurn)) {
+                            selectedPiece = {EMPTY, NONE};
+                            selectedRow = -1;
+                            selectedCol = -1;
+                            currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+                            return; // Kết thúc vì nhập thành đã được thực hiện
+                        }
+                    }
+                }
                 if (row == selectedRow && col == selectedCol) {
                     selectedPiece = {EMPTY, NONE};
                     selectedRow = -1;
@@ -60,22 +82,7 @@ void HandlePlayEvent(SDL_Event& e) {
                     return;
                 }
 
-                // Kiểm tra nhập thành
-                if (selectedPiece.type == KING && abs(selectedCol - col) == 2) {
-                    Castle castle;
-                    Position kingPos = {selectedRow, selectedCol};
-                    Position rookPos = (col > selectedCol) ? Position{selectedRow, 7} : Position{selectedRow, 0};
-
-                    if (castle.performCastle(board, kingPos, rookPos)) {
-                        selectedPiece = {EMPTY, NONE};
-                        selectedRow = -1;
-                        selectedCol = -1;
-                        currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
-                        return; // Kết thúc vì nhập thành đã được thực hiện
-                    }
-                }
-
-                // Di chuyển thông thường
+                //di chuyen thong thuong
                 if (IsValidMove(selectedRow, selectedCol, row, col) &&
                     !DoesMovePutKingInCheck(selectedRow, selectedCol, row, col)) {
                     MovePiece(selectedRow, selectedCol, row, col);
@@ -92,8 +99,6 @@ void RenderPlay(SDL_Renderer* renderer) {
     if (isPlaying){
         if (playBackgroundTexture) {
             SDL_RenderCopy(renderer, playBackgroundTexture, NULL, NULL);
-        } else {
-            std::cerr << "Texture background gameplay bi null!" << std::endl;
         }
 
         int boardSize = 400;
@@ -102,7 +107,14 @@ void RenderPlay(SDL_Renderer* renderer) {
         int startX = (960 - boardSize) / 2;
         int startY = (720 - boardSize) / 2;
 
-        //ve vien mau den
+        //ve nut replay
+        SDL_Rect replayButton = {startX + boardSize / 2 - 50, startY + boardSize + 20, 100, 50};
+        SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255);
+        SDL_RenderFillRect(renderer, &replayButton);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(renderer, &replayButton);
+        
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_Rect borderRect = {startX - 5, startY - 5, boardSize + 10, boardSize + 10};
         SDL_RenderFillRect(renderer, &borderRect);
@@ -156,5 +168,4 @@ void CleanupPlay() {
         SDL_DestroyTexture(playBackgroundTexture);
         playBackgroundTexture = nullptr;
     }
-    std::cout << "Da don dep tai nguyen gameplay" << std::endl;
 }

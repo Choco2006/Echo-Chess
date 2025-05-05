@@ -8,7 +8,6 @@ std::vector<Button> menuButtons;
 
 //tai anh nen background
 bool LoadMenu(SDL_Renderer* renderer) {
-    std::cout << "Dang tai menu" << std::endl;
 
     //load background
     SDL_Surface* surface = IMG_Load("resources/images/background.png");
@@ -16,19 +15,15 @@ bool LoadMenu(SDL_Renderer* renderer) {
         std::cerr << "Khong the tai duoc hinh nen! Loi: " << IMG_GetError() << std::endl;
         return false;
     }
-    std::cout << "Tai anh nen thanh cong!" << std::endl;
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
     if (!backgroundTexture) return false;
 
     //load music
-    std::cout << "Dang load nhac nen..." << std::endl;
     bgMusic = Mix_LoadMUS("resources/sound/bg_music.mp3");
     if (!bgMusic) {
         std::cerr << "Khong the load nhac nen! Loi: " << Mix_GetError() << std::endl;
         return false;
-    } else {
-        std::cout << "Tai nhac nen thanh cong!" << std::endl;
     }
     Mix_PlayMusic(bgMusic, -1);
 
@@ -80,12 +75,6 @@ bool LoadMenu(SDL_Renderer* renderer) {
     menuButtons.push_back(Button((960 - 200)/2, 410, 200, 50, optionTexture, optionHoverTexture));  //"option"
     menuButtons.push_back(Button((960 - 200)/2, 490, 200, 50, exitTexture, exitHoverTexture));  // "exit"
 
-    // Tải option menu
-    if (!LoadOption(renderer)) {
-        std::cerr << "Khong the load option" << std::endl;
-        return false;
-    }
-
     //phan return ham bool gốc
     return true; 
 }
@@ -109,11 +98,10 @@ void HandleMenuEvent(SDL_Event& e, bool& isRunning, bool& inMenu){
 
     //nut play
     if (menuButtons[0].HandleEvent(e)){
-        std::cout << "Bat dau tro choi moi!" << std::endl;
         inMenu = false;
     }
 
-    //nut"option"
+    //nut option
     if (menuButtons[1].HandleEvent(e)) { 
         isOptionOpen = true; 
     }
@@ -121,9 +109,8 @@ void HandleMenuEvent(SDL_Event& e, bool& isRunning, bool& inMenu){
         HandleOptionEvent(e);
     }
 
-    //nut "exit"
+    //nut exit
     if (menuButtons[2].HandleEvent(e)){
-        std::cout << "Thoat game!" << std::endl;
         isRunning = false;
     }
 }

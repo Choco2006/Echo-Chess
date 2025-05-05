@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 extern bool isOptionOpen;
+extern bool isDraggingVolumeSlider;
 
 bool LoadOption(SDL_Renderer* renderer);
 
